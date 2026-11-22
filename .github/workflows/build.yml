@@ -2,42 +2,56 @@ name: Build (Windows)
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 jobs:
   windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+
+      - name: Limpiar directorio de compilación
+        shell: pwsh
+        run: Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+
       - name: Configurar entorno MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
 
       - name: Configurar
-        run: cmake -S . -B build -G "Ninja" -A x64
+        shell: pwsh
+        run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
-      - name: Compilar (Release)
-        run: cmake --build build --config Release --parallel
+      - name: Compilar
+        shell: pwsh
+        run: cmake --build build --parallel
 
-      - name: Tests del nucleo
+      - name: Ejecutar pruebas
+        shell: pwsh
         run: ctest --test-dir build -C Release --output-on-failure
 
       - name: Descargar pluginval
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip" -OutFile pluginval.zip
-          Expand-Archive pluginval.zip -DestinationPath pluginval
+          Invoke-WebRequest `
+            -Uri "https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip" `
+            -OutFile pluginval.zip
+          Expand-Archive pluginval.zip -DestinationPath pluginval -Force
 
       - name: Validar VST3 con pluginval
         shell: pwsh
         run: |
-          ./pluginval/pluginval.exe --strictness-level 5 --validate-in-process --skip-gui-tests "build/MasterZaster_artefacts/Release/VST3/MasterZaster.vst3"
+          ./pluginval/pluginval.exe `
+            --strictness-level 5 `
+            --validate-in-process `
+            --skip-gui-tests `
+            "build/MasterZaster_artifacts/Release/VST3/MasterZaster.vst3"
 
       - name: Subir artefacto VST3
         uses: actions/upload-artifact@v4
         with:
           name: MasterZaster-VST3-windows
-          path: build/MasterZaster_artefacts/Release/VST3/MasterZaster.vst3
+          path: build/MasterZaster_artifacts/Release/VST3/MasterZaster.vst3
