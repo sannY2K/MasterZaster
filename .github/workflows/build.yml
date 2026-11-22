@@ -48,10 +48,10 @@ jobs:
             --strictness-level 5 `
             --validate-in-process `
             --skip-gui-tests `
-            "build/MasterZaster_artifacts/Release/VST3/MasterZaster.vst3"
+            "build/MasterZaster_artefacts/Release/VST3/MasterZaster.vst3"
 
       - name: Subir artefacto VST3
         uses: actions/upload-artifact@v4
         with:
           name: MasterZaster-VST3-windows
-          path: build/MasterZaster_artifacts/Release/VST3/MasterZaster.vst3
+          path: build/MasterZaster_artefacts/Release/VST3/MasterZaster.vst3
