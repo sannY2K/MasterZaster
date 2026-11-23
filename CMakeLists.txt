@@ -25,6 +25,8 @@ FetchContent_MakeAvailable(JUCE)
 # --- Nucleo (sin JUCE, testeable en cualquier plataforma) ----------------
 add_library(MZCore STATIC
     Source/Core/Dsp/Decibels.cpp
+    Source/Core/Metering/LevelMeter.cpp
+    Source/Core/Metering/StereoMeter.cpp
 )
 target_include_directories(MZCore PUBLIC Source/Core)
 target_compile_features(MZCore PUBLIC cxx_std_20)
@@ -54,6 +56,7 @@ target_sources(MasterZaster PRIVATE
     Source/Plugin/PluginProcessor.h
     Source/Plugin/PluginEditor.cpp
     Source/Plugin/PluginEditor.h
+    Source/Plugin/UI/MZLookAndFeel.h
 )
 
 target_include_directories(MasterZaster PRIVATE Source)

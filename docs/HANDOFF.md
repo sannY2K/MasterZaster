@@ -24,14 +24,19 @@ Otra sesión de Claude ya trabajó en esto y se agotó la cuota. Retómalo sin r
 - Pasos pequeños y compilables, un commit por cambio coherente.
 - Al terminar la sesión (o si ves que la cuota se agota): actualiza "ESTADO ACTUAL", haz commit y push, y dime qué pegar en la siguiente sesión.
 - Si algo de la especificación es inviable o ambiguo, avísame y propón alternativa antes de construir.
+- La conexión de GitHub de Claude es de solo lectura (403 al escribir): los archivos se entregan para subirlos con GitHub Desktop.
 
 ## Primera acción
 Haz el Paso 1, dame el resumen y continúa con el siguiente pendiente de la versión actual.
 
 ## ESTADO ACTUAL (actualizar en cada sesión)
 - Versión en curso: V1 (Core)
-- Fase: especificación y planificación; todavía no hay código implementado ni probado.
-- Pendiente inmediato: 1) análisis de viabilidad, 2) arquitectura, dependencias y plan de V1, 3) estructura del repo y CMakeLists.txt (JUCE, VST3, VS2022), 4) motor de análisis e interfaz inicial.
-- Compilado: no
-- Probado en Ableton Live: no
-- Problemas conocidos: ninguno registrado
+- Hito M0 (esqueleto): el VST3 compila y Ableton Live lo reconoce (confirmado por el usuario). Pendiente confirmar: workflow de GitHub Actions en verde y resultado de `pluginval`.
+- UI: estilo futurista aplicado (`Source/Plugin/UI/MZLookAndFeel.h` + editor). Solo hay un knob de ganancia de salida; aún no hay medidores ni espectro.
+- Hito M1 (núcleo de medición), en curso:
+  - Implementado y probado con g++ 13 (-Wall -Wextra -Wpedantic -Wconversion -Wshadow, sin advertencias; 17 pruebas OK con un shim local de Catch2): `LevelAccumulator` (pico, RMS, factor de cresta) y `StereoAccumulator` (correlación, anchura). Tests en `Tests/MeteringTests.cpp`.
+  - Pendiente de verificar: compilación con MSVC y ejecución con Catch2 real (CI o Visual Studio); `ctest` en verde.
+  - Pendiente de implementar: LUFS (momentáneo, corto plazo, integrado), LRA y True Peak (BS.1770-4 / EBU R128; el plan propone libebur128, ver decisión abierta), y conectar los medidores al `PluginProcessor` sin asignaciones en el hilo de audio.
+- Decisión abierta: LUFS/True Peak con libebur128 (MIT, dependencia vía FetchContent, como dice el plan) o con implementación propia en MZCore (sin red, verificable en Linux). Pendiente de que el usuario elija.
+- Probado en Ableton Live: solo reconocimiento del plugin. Sin prueba de audio, CPU ni guardado de sesión.
+- Problemas conocidos: el 22/11/2026 se borró por error el contenido del repo con un commit ("Nosé"); se restauró desde el historial. Vigilar que no falte ningún archivo.
