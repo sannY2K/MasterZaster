@@ -12,8 +12,10 @@ add_executable(MZCoreTests
     DecibelsTests.cpp
     MeteringTests.cpp
     LiveMetersTests.cpp
+    Ebur128SmokeTests.cpp
 )
-target_link_libraries(MZCoreTests PRIVATE MZCore Catch2::Catch2WithMain)
+target_link_libraries(MZCoreTests PRIVATE MZCore Catch2::Catch2WithMain ebur128)
+target_include_directories(MZCoreTests PRIVATE ${libebur128_SOURCE_DIR}/ebur128)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)

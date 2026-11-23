@@ -22,6 +22,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(JUCE)
 
+# --- libebur128 (LUFS / LRA / True Peak, BS.1770 / EBU R128) -------------
+FetchContent_Declare(
+    libebur128
+    GIT_REPOSITORY https://github.com/jiixyj/libebur128.git
+    GIT_TAG        v1.2.6
+    GIT_SHALLOW    ON
+)
+# v1.2.6 declara cmake_minimum_required 2.8.12; CMake 4.x lo rechaza sin esto.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+# Estatica (no DLL). Forzado en cache para que Catch2 tampoco salga compartido.
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(libebur128)
+unset(CMAKE_POLICY_VERSION_MINIMUM)
+
 # --- Nucleo (sin JUCE, testeable en cualquier plataforma) ----------------
 add_library(MZCore STATIC
     Source/Core/Dsp/Decibels.cpp
@@ -30,6 +44,8 @@ add_library(MZCore STATIC
     Source/Core/Metering/LiveMeters.cpp
 )
 target_include_directories(MZCore PUBLIC Source/Core)
+target_include_directories(MZCore PRIVATE ${libebur128_SOURCE_DIR}/ebur128)
+target_link_libraries(MZCore PRIVATE ebur128)
 target_compile_features(MZCore PUBLIC cxx_std_20)
 
 # --- Plugin ----------------------------------------------------------------
