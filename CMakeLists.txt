@@ -27,6 +27,7 @@ add_library(MZCore STATIC
     Source/Core/Dsp/Decibels.cpp
     Source/Core/Metering/LevelMeter.cpp
     Source/Core/Metering/StereoMeter.cpp
+    Source/Core/Metering/LiveMeters.cpp
 )
 target_include_directories(MZCore PUBLIC Source/Core)
 target_compile_features(MZCore PUBLIC cxx_std_20)
@@ -57,6 +58,7 @@ target_sources(MasterZaster PRIVATE
     Source/Plugin/PluginEditor.cpp
     Source/Plugin/PluginEditor.h
     Source/Plugin/UI/MZLookAndFeel.h
+    Source/Plugin/UI/MeterPanel.h
 )
 
 target_include_directories(MasterZaster PRIVATE Source)

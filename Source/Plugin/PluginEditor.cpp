@@ -3,11 +3,13 @@
 namespace
 {
     constexpr int kWidth        = 520;
-    constexpr int kHeight       = 380;
+    constexpr int kMeterH       = 130;   // panel de medidores (bajo el knob)
+    constexpr int kHeight       = 380 + kMeterH;
     constexpr int kHeaderH      = 64;
     constexpr int kFooterH      = 36;
     constexpr int kKnobAreaSize = 200;   // zona del knob (cuadrada)
     constexpr int kTextBoxH     = 26;    // caja de valor bajo el knob
+    constexpr int kMeterMargin  = 40;    // margen lateral del panel de medidores
 
     // Linea horizontal que se desvanece hacia los bordes, con halo.
     void drawGlowLine (juce::Graphics& g, float y, float width)
@@ -43,12 +45,14 @@ namespace
 MasterZasterAudioProcessorEditor::MasterZasterAudioProcessorEditor (MasterZasterAudioProcessor& p)
     : juce::AudioProcessorEditor (&p),
       processorRef (p),
-      gainAttachment (p.apvts, MasterZasterAudioProcessor::outputGainId, gainSlider)
+      gainAttachment (p.apvts, MasterZasterAudioProcessor::outputGainId, gainSlider),
+      meterPanel ([&p] { return p.getMeterSnapshot(); })
 {
     gainSlider.setLookAndFeel (&lookAndFeel);
     gainSlider.setTextValueSuffix (" dB");
     gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, kTextBoxH);
     addAndMakeVisible (gainSlider);
+    addAndMakeVisible (meterPanel);
 
     setSize (kWidth, kHeight);
 }
@@ -100,10 +104,15 @@ void MasterZasterAudioProcessorEditor::paint (juce::Graphics& g)
                 juce::Rectangle<int> (0, gainSlider.getY() - 20, getWidth(), 16),
                 juce::Justification::centred);
 
+    // Separador sobre los medidores
+    const float meterTop = (float) meterPanel.getY() - 6.0f;
+    g.setColour (mz::ui::accent().withAlpha (0.25f));
+    g.fillRect ((float) kMeterMargin, meterTop, w - 2.0f * kMeterMargin, 1.0f);
+
     // Pie (estado real del hito)
     g.setColour (mz::ui::textDim().withAlpha (0.8f));
     g.setFont (juce::FontOptions (11.0f));
-    g.drawText ("M0 - PASS-THROUGH",
+    g.drawText ("M1 - METERING (INPUT)",
                 getLocalBounds().removeFromBottom (kFooterH),
                 juce::Justification::centred);
 
@@ -118,6 +127,8 @@ void MasterZasterAudioProcessorEditor::resized()
     auto area = getLocalBounds();
     area.removeFromTop (kHeaderH);
     area.removeFromBottom (kFooterH);
+
+    meterPanel.setBounds (area.removeFromBottom (kMeterH).reduced (kMeterMargin, 8));
 
     gainSlider.setBounds (area.withSizeKeepingCentre (kKnobAreaSize, kKnobAreaSize + kTextBoxH)
                               .translated (0, 8));

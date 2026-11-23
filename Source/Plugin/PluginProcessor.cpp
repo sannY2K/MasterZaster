@@ -30,6 +30,8 @@ void MasterZasterAudioProcessor::prepareToPlay (double sampleRate, int /*samples
 {
     gainSmoothed.reset (sampleRate, 0.02);
     gainSmoothed.setCurrentAndTargetValue (mz::decibelsToGain (outputGainParam->load()));
+
+    liveMeters.prepare (sampleRate);
 }
 
 bool MasterZasterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -50,11 +52,14 @@ void MasterZasterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (int ch = getTotalNumInputChannels(); ch < getTotalNumOutputChannels(); ++ch)
         buffer.clear (ch, 0, buffer.getNumSamples());
 
-    // M0: el audio pasa sin cambios salvo la ganancia de salida (0 dB por defecto).
-    gainSmoothed.setTargetValue (mz::decibelsToGain (outputGainParam->load()));
-
     const int numChannels = buffer.getNumChannels();
     const int numSamples  = buffer.getNumSamples();
+
+    // M1: medicion de la entrada, ANTES de la ganancia de salida. No modifica el audio.
+    liveMeters.process (buffer.getArrayOfReadPointers(), numChannels, numSamples);
+
+    // El audio pasa sin cambios salvo la ganancia de salida (0 dB por defecto).
+    gainSmoothed.setTargetValue (mz::decibelsToGain (outputGainParam->load()));
 
     if (gainSmoothed.isSmoothing())
     {

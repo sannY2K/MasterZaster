@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(MZCoreTests
     DecibelsTests.cpp
     MeteringTests.cpp
+    LiveMetersTests.cpp
 )
 target_link_libraries(MZCoreTests PRIVATE MZCore Catch2::Catch2WithMain)
 

@@ -2,6 +2,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Metering/LiveMeters.h"
+
 class MasterZasterAudioProcessor final : public juce::AudioProcessor
 {
 public:
@@ -39,6 +41,9 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    // Mediciones de la ENTRADA (antes de la ganancia de salida). Seguro desde cualquier hilo.
+    mz::MeterSnapshot getMeterSnapshot() const noexcept { return liveMeters.snapshot(); }
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -46,6 +51,8 @@ private:
 
     std::atomic<float>* outputGainParam = nullptr;
     juce::SmoothedValue<float> gainSmoothed { 1.0f };
+
+    mz::LiveMeters liveMeters;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MasterZasterAudioProcessor)
 };

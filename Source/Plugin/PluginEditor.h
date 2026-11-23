@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "UI/MZLookAndFeel.h"
+#include "UI/MeterPanel.h"
 
 class MasterZasterAudioProcessorEditor final : public juce::AudioProcessorEditor
 {
@@ -20,6 +21,8 @@ private:
 
     juce::Slider gainSlider { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::TextBoxBelow };
     juce::AudioProcessorValueTreeState::SliderAttachment gainAttachment;
+
+    mz::ui::MeterPanel meterPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MasterZasterAudioProcessorEditor)
 };
